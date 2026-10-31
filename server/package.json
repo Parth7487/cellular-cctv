@@ -1,0 +1,19 @@
+{
+  "name": "cellular-cctv-signaling-server",
+  "version": "1.0.0",
+  "description": "Ultra-low latency WebSocket signaling server for Cellular Android CCTV surveillance",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test tests/*.test.js",
+    "verify-turn": "node tests/verify-turn.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "ws": "^8.18.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

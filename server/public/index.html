@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Cellular CCTV — Live Security Console</title>
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300e5ff'><circle cx='12' cy='12' r='3'/><path d='M2 12C2 12 5 5 12 5C19 5 22 12 22 12C22 12 19 19 12 19C5 19 2 12 2 12Z' stroke='%2300e5ff' stroke-width='2' fill='none'/></svg>">
+</head>
+<body>
+
+  <!-- Top App Navigation Bar -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-icon">👁</div>
+      <div>
+        <span class="brand-title">Cellular Android CCTV</span>
+      </div>
+      <span class="brand-badge">CGNAT P2P</span>
+    </div>
+
+    <div class="header-actions">
+      <div id="headerBatteryPill" class="header-battery-badge" style="display: none;" title="Phone Battery & Temperature">
+        <span id="headerBatteryIcon">🔋</span>
+        <span id="headerBatteryText">--%</span>
+      </div>
+      <div id="statusPill" class="status-badge">
+        <span id="statusDot" class="status-dot"></span>
+        <span id="statusLabel">Disconnected</span>
+      </div>
+      <button id="btnOpenSms" class="sms-header-btn" title="View SIM Messages & OTPs">
+        <span>📩 SIM Messages</span>
+        <span id="smsUnreadBadge" class="sms-badge" style="display: none;">0</span>
+      </button>
+      <button id="btnOpenHealth" class="health-header-btn" title="View Device Health & Diagnostics">
+        <span>🩺 Phone Health</span>
+      </button>
+      <button id="btnOpenCalls" class="calls-header-btn" title="Remote Phone Dialer & Calls">
+        <span>📞 Calls & Dialer</span>
+      </button>
+      <button id="btnHeaderConnect" class="primary">Connect</button>
+    </div>
+  </header>
+
+  <!-- Main Grid Layout -->
+  <main class="main-container">
+
+    <!-- Left: Video Viewport & Immediate Action Bar -->
+    <section class="video-stage-card" id="viewLiveCard">
+      <div class="video-container">
+        <!-- Live Video Element with autoplay and muted fallback -->
+        <video id="remoteVideo" autoplay playsinline muted></video>
+
+        <!-- Tap to Unmute Overlay Banner -->
+        <button id="btnUnmuteOverlay" class="unmute-overlay-banner" title="Click to hear audio from camera">
+          <span class="unmute-pulse-dot"></span>
+          <span class="unmute-icon">🔊</span>
+          <span class="unmute-text">Live Audio Muted — Tap to Listen</span>
+        </button>
+
+        <!-- Dynamic In-Video Telemetry Overlay -->
+        <div class="video-overlay-top">
+          <div class="cam-meta-badge">
+            <span id="feedLiveDot" class="status-dot"></span>
+            <span id="streamTimeCode">00:00:00</span>
+          </div>
+          <div class="cam-meta-badge">
+            <span id="iceStatePill">ICE: New</span>
+          </div>
+        </div>
+
+        <!-- Placeholder When Offline or Waiting for Camera -->
+        <div id="videoPlaceholder" class="video-placeholder">
+          <div class="spinner"></div>
+          <p id="placeholderText">Waiting for Camera Connection...</p>
+        </div>
+      </div>
+
+      <!-- Action & Viewport Tool Bar -->
+      <div class="video-controls-bar">
+        <div class="button-group">
+          <button id="btnToggleAudio" title="Mute/Unmute audio">
+            <span id="audioIcon">🔇</span> <span id="audioText">Unmute</span>
+          </button>
+          
+          <!-- Live Audio Volume Booster -->
+          <div class="audio-boost-box" title="Amplify microphone volume from phone (up to 300%)">
+            <span style="font-size: 13px;">🔊</span>
+            <input type="range" id="volumeSlider" min="0" max="300" value="100" style="width: 72px; accent-color: var(--accent-cyan); cursor: pointer;">
+            <span id="volumeValue" style="font-size: 11px; font-weight: 600; min-width: 34px;">100%</span>
+          </div>
+
+          <button id="btnSnapshot" title="Take instant snapshot">
+            📷 Snapshot
+          </button>
+
+          <!-- Recording Controls (With Audio / Video Only) -->
+          <button id="btnRecordVideo" class="record-btn" title="Record video from stream">
+            <span id="recordIcon">⏺️</span> <span id="recordText">Record</span>
+          </button>
+          <button id="btnRecordAudioToggle" class="record-toggle-btn" title="Toggle recording with sound or video only">
+            🎙️ Audio: ON
+          </button>
+
+          <div id="recordingBadge" class="recording-badge" style="display: none;">
+            <span class="rec-dot"></span>
+            <span id="recTimerText">REC 00:00</span>
+          </div>
+
+          <button id="btnFullscreen" title="Toggle Fullscreen">
+            ⛶ Fullscreen
+          </button>
+        </div>
+
+        <div class="button-group">
+          <span id="peerCountBadge" class="brand-badge">0 Peers</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right: Hardware Controls & Session Configuration -->
+    <aside class="sidebar" id="sidebarControls">
+
+      <!-- Hardware Remote Control Deck -->
+      <div class="panel-card">
+        <div class="panel-title">
+          <span>Camera Controls</span>
+          <span style="font-size: 16px;">⚙</span>
+        </div>
+
+        <button id="btnTorch" title="Toggle Phone Flashlight">
+          🔦 Flashlight: OFF
+        </button>
+
+        <button id="btnSwitchLens" title="Switch Front/Rear Camera">
+          🔄 Switch to Front Camera
+        </button>
+
+        <!-- Digital Zoom Slider -->
+        <div class="slider-container">
+          <div class="slider-header">
+            <span>Digital Zoom</span>
+            <span id="zoomValueText">1.0x</span>
+          </div>
+          <input type="range" id="zoomSlider" min="0" max="100" value="0">
+          <div class="preset-pills">
+            <button class="preset-pill" data-zoom="0">1x</button>
+            <button class="preset-pill" data-zoom="25">2x</button>
+            <button class="preset-pill" data-zoom="50">3x</button>
+            <button class="preset-pill" data-zoom="100">5x</button>
+          </div>
+        </div>
+
+        <!-- Push to Talk Intercom with Audio Meter -->
+        <div style="margin-top: 8px;">
+          <button id="btnPtt" class="ptt-button" title="Hold to speak to Android camera speaker">
+            <span>🎙</span>
+            <span id="pttLabel">HOLD TO TALK</span>
+          </button>
+
+          <div id="pttVolumeContainer" class="ptt-volume-container" style="display: none;">
+            <div class="ptt-volume-header">
+              <span>🎙️ Mic Input</span>
+              <span id="pttVolumeVal">0%</span>
+            </div>
+            <div class="ptt-meter-track">
+              <div id="pttMeterFill" class="ptt-meter-fill" style="width: 0%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Siren Trigger -->
+        <button id="btnSiren" class="danger" title="Sound loud deterrent alarm on phone">
+          🚨 Sound Siren
+        </button>
+      </div>
+ 
+      <!-- Remote Screen Message Broadcast Deck -->
+      <div class="panel-card message-broadcast-card">
+        <div class="panel-title">
+          <span>📣 Broadcast Message to Phone Screen</span>
+          <span style="font-size: 11px; padding: 2px 6px; border-radius: 4px; background: rgba(0, 240, 255, 0.15); color: var(--accent-cyan);">Live Popup</span>
+        </div>
+        <p style="font-size: 12px; color: var(--text-secondary); margin: 6px 0 10px 0; line-height: 1.4;">
+          Type a message to display prominently over the phone screen with a live countdown timer.
+        </p>
+
+        <div class="input-field">
+          <label for="inputPopupMessage">Message Content</label>
+          <textarea id="inputPopupMessage" rows="2" placeholder="e.g. Leave package at front door! Security camera active." style="width: 100%; resize: vertical; min-height: 52px; font-size: 13px; padding: 8px; border-radius: 6px; background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-color);"></textarea>
+        </div>
+
+        <!-- Quick Preset Chips -->
+        <div class="quick-chips" style="display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 10px 0;">
+          <button class="quick-chip" type="button" data-msg="📦 Delivery: Please leave package at the door!">📦 Package</button>
+          <button class="quick-chip" type="button" data-msg="⚠️ WARNING: You are on live security camera recording!">⚠️ Security</button>
+          <button class="quick-chip" type="button" data-msg="📞 Please call me right now!">📞 Call Me</button>
+          <button class="quick-chip" type="button" data-msg="👋 Hello! Camera monitoring active.">👋 Hello</button>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 8px; align-items: center;">
+          <div style="flex: 1;">
+            <label for="selectPopupDuration" style="font-size: 11px; color: var(--text-secondary); display: block; margin-bottom: 4px;">Timer Duration</label>
+            <select id="selectPopupDuration" style="width: 100%; height: 36px; background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 6px; padding: 0 8px; font-size: 12px;">
+              <option value="10">10 Seconds</option>
+              <option value="30" selected>30 Seconds</option>
+              <option value="60">1 Minute</option>
+              <option value="120">2 Minutes</option>
+              <option value="300">5 Minutes</option>
+              <option value="0">⏱️ Keep Until Dismissed</option>
+            </select>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 6px; margin-top: 16px;">
+            <input type="checkbox" id="checkPopupChime" checked style="accent-color: var(--accent-cyan); cursor: pointer; width: 16px; height: 16px;">
+            <label for="checkPopupChime" style="font-size: 12px; color: var(--text-secondary); cursor: pointer;">Sound Chime</label>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-top: 12px;">
+          <button id="btnSendPopupMsg" class="accent-btn" style="flex: 2; height: 42px; font-size: 13px; font-weight: 700; background: linear-gradient(135deg, #00F0FF, #0070F3); color: #000; border: none; border-radius: 8px; cursor: pointer;">
+            🚀 Show on Screen
+          </button>
+          <button id="btnDismissPopupMsg" class="subtle-btn" style="flex: 1; height: 42px; font-size: 12px; background: var(--bg-surface-elevated); color: var(--text-secondary); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; display: none;">
+            ✕ Dismiss
+          </button>
+        </div>
+      </div>
+
+      <!-- Connection & Room Settings Panel -->
+      <div class="panel-card">
+        <div class="panel-title">
+          <span>Connection Settings</span>
+        </div>
+
+        <div class="input-field">
+          <label for="serverUrl">Signaling URL</label>
+          <input type="text" id="serverUrl" placeholder="wss://cellular-cctv.onrender.com">
+        </div>
+
+        <div class="input-field">
+          <label for="roomId">Room ID</label>
+          <input type="text" id="roomId" placeholder="cctv-room-1">
+        </div>
+
+        <button id="btnSaveConfig">Save Settings</button>
+      </div>
+
+    </aside>
+
+  </main>
+
+  <!-- SMS Drawer Backdrop -->
+  <div id="smsBackdrop" class="sms-backdrop"></div>
+
+  <!-- SMS & OTP Drawer / Modal -->
+  <aside id="smsDrawer" class="sms-drawer" aria-label="SIM Card Messages">
+    <div class="sms-drawer-header">
+      <div>
+        <div class="sms-drawer-title">
+          <span>📱 SIM Card Messages & OTPs</span>
+        </div>
+        <div class="sms-drawer-subtitle">
+          Direct from phone SIM • Secure P2P
+        </div>
+      </div>
+      <div class="sms-header-tools">
+        <button id="btnRefreshSms" class="sms-icon-btn" title="Refresh Inbox from Phone">
+          🔄
+        </button>
+        <button id="btnCloseSms" class="sms-icon-btn" title="Close Drawer">
+          ✕
+        </button>
+      </div>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <div class="sms-search-bar">
+      <input type="text" id="smsSearchInput" placeholder="Search by name, number, or OTP..." autocomplete="off">
+    </div>
+
+    <!-- Direction Filter Tabs -->
+    <div class="sms-filter-tabs">
+      <button class="sms-filter-pill active" data-filter="all">All Messages</button>
+      <button class="sms-filter-pill" data-filter="received">📥 Received</button>
+      <button class="sms-filter-pill" data-filter="sent">📤 Sent</button>
+    </div>
+
+    <!-- Scrollable Message List -->
+    <div id="smsListContainer" class="sms-list">
+      <!-- Dynamically populated -->
+    </div>
+  </aside>
+
+  <!-- Device Health Drawer Backdrop -->
+  <div id="healthBackdrop" class="sms-backdrop"></div>
+
+  <!-- Device Health & Diagnostics Drawer -->
+  <aside id="healthDrawer" class="health-drawer" aria-label="Device Health and Diagnostics">
+    <div class="sms-drawer-header">
+      <div>
+        <div class="sms-drawer-title">
+          <span>🩺 Phone Health & Diagnostics</span>
+        </div>
+        <div class="sms-drawer-subtitle">
+          Real-time hardware, storage & battery telemetry
+        </div>
+      </div>
+      <div class="sms-header-tools">
+        <button id="btnRefreshHealth" class="sms-icon-btn" title="Refresh Telemetry">
+          🔄
+        </button>
+        <button id="btnCloseHealth" class="sms-icon-btn" title="Close Drawer">
+          ✕
+        </button>
+      </div>
+    </div>
+
+    <!-- Scrollable Diagnostics Content -->
+    <div class="health-content">
+
+      <!-- 1. Battery & Thermals Card -->
+      <div class="health-card">
+        <div class="health-card-header">
+          <span class="health-card-title">🔋 Battery & Thermals</span>
+          <span id="healthBatteryStatus" class="health-status-badge">Checking...</span>
+        </div>
+        <div class="health-battery-hero">
+          <div class="health-battery-val" id="healthBatteryPercent">--%</div>
+          <div class="health-battery-stats">
+            <div>Temperature: <strong id="healthBatteryTemp">--°C</strong></div>
+            <div>Health: <strong id="healthBatteryHealth">--</strong></div>
+          </div>
+        </div>
+        <div class="health-meter-bg">
+          <div id="healthBatteryFill" class="health-meter-fill" style="width: 50%;"></div>
+        </div>
+      </div>
+
+      <!-- 2. Device Storage Card -->
+      <div class="health-card">
+        <div class="health-card-header">
+          <span class="health-card-title">💾 Internal Storage</span>
+          <span id="healthStorageFreeText" class="health-status-badge">-- free</span>
+        </div>
+        <div class="health-meter-labels">
+          <span>Used: <strong id="healthStorageUsedText">--</strong></span>
+          <span>Total: <strong id="healthStorageTotalText">--</strong></span>
+        </div>
+        <div class="health-meter-bg">
+          <div id="healthStorageFill" class="health-meter-fill" style="width: 50%;"></div>
+        </div>
+      </div>
+
+      <!-- 3. Top Space-Consuming Apps Card -->
+      <div class="health-card">
+        <div class="health-card-header">
+          <span class="health-card-title">📱 Top Space-Consuming Apps</span>
+          <span class="health-subtle-hint">Largest app sizes</span>
+        </div>
+        <div id="healthTopAppsList" class="health-apps-list">
+          <div class="health-loading">Loading installed apps storage...</div>
+        </div>
+      </div>
+
+      <!-- 4. RAM / Memory Card -->
+      <div class="health-card">
+        <div class="health-card-header">
+          <span class="health-card-title">🧠 RAM / System Memory</span>
+        </div>
+        <div class="health-meter-labels">
+          <span>Used: <strong id="healthMemoryUsedText">--</strong></span>
+          <span>Total: <strong id="healthMemoryTotalText">--</strong></span>
+        </div>
+        <div class="health-meter-bg">
+          <div id="healthMemoryFill" class="health-meter-fill" style="width: 40%; background: #b388ff;"></div>
+        </div>
+      </div>
+
+      <!-- 5. System, Time & Uptime Card -->
+      <div class="health-card">
+        <div class="health-card-header">
+          <span class="health-card-title">⏱️ Device Hardware & Uptime</span>
+        </div>
+        <div class="health-sys-info-grid">
+          <div class="health-info-item">
+            <span class="health-info-label">Device Model</span>
+            <span id="healthSystemModel" class="health-info-val">--</span>
+          </div>
+          <div class="health-info-item">
+            <span class="health-info-label">OS Version</span>
+            <span id="healthSystemAndroid" class="health-info-val">--</span>
+          </div>
+          <div class="health-info-item">
+            <span class="health-info-label">System Uptime</span>
+            <span id="healthSystemUptime" class="health-info-val">--</span>
+          </div>
+          <div class="health-info-item">
+            <span class="health-info-label">Phone Local Time</span>
+            <span id="healthSystemTime" class="health-info-val">--</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- Floating Incoming Call Alert Modal -->
+  <div id="incomingCallAlert" class="incoming-call-modal" style="display: none;">
+    <div class="incoming-call-card">
+      <div class="incoming-call-icon animate-pulse">📞</div>
+      <div class="incoming-call-info">
+        <span class="incoming-call-tag">INCOMING CELLULAR CALL</span>
+        <h3 id="incomingCallName" class="incoming-call-name">Incoming Caller</h3>
+        <p id="incomingCallNumber" class="incoming-call-number">+91 00000 00000</p>
+      </div>
+      <div class="incoming-call-actions">
+        <button id="btnAnswerIncoming" class="btn-call-answer">
+          <span>📞</span> Answer (Speaker)
+        </button>
+        <button id="btnRejectIncoming" class="btn-call-reject">
+          <span>❌</span> Decline
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calls Drawer Backdrop -->
+  <div id="callsBackdrop" class="sms-backdrop"></div>
+
+  <!-- Calls & Dialer Drawer -->
+  <aside id="callsDrawer" class="calls-drawer" aria-label="SIM Calls and Dialer">
+    <div class="sms-drawer-header">
+      <div>
+        <div class="sms-drawer-title">
+          <span>📞 SIM Calls & Remote Dialer</span>
+        </div>
+        <div class="sms-drawer-subtitle">
+          Place cellular calls, speakerphone bridge & logs
+        </div>
+      </div>
+      <div class="sms-header-tools">
+        <button id="btnRefreshCalls" class="sms-icon-btn" title="Refresh Logs">
+          🔄
+        </button>
+        <button id="btnCloseCalls" class="sms-icon-btn" title="Close Drawer">
+          ✕
+        </button>
+      </div>
+    </div>
+
+    <!-- Calls Navigation Tabs -->
+    <div class="calls-tabs-bar">
+      <button class="calls-tab-pill active" data-tab="dialer">Dialer</button>
+      <button class="calls-tab-pill" data-tab="logs">Call Logs</button>
+      <button class="calls-tab-pill" data-tab="recordings">Recordings</button>
+    </div>
+
+    <div class="calls-drawer-content">
+
+      <!-- Active Call HUD (Shows during call) -->
+      <div id="activeCallBanner" class="active-call-banner" style="display: none;">
+        <div class="active-call-left">
+          <span id="activeCallTitle" class="active-call-state-title">IN CALL</span>
+          <span id="activeCallSubtitle" class="active-call-party">Caller Name</span>
+        </div>
+        <div class="active-call-right">
+          <span id="activeCallTimer" class="active-call-timer">00:00</span>
+          <div class="active-call-buttons">
+            <button id="btnSpeakerphoneToggle" class="call-hud-btn speaker">🔊 Speaker: ON</button>
+            <button id="btnEndActiveCall" class="call-hud-btn hangup">End Call</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 1: Dialer -->
+      <div id="callTabDialer" class="call-tab-section">
+        <div class="dialer-screen">
+          <input type="text" id="dialerInput" placeholder="Enter phone number..." autocomplete="off">
+          <button id="btnDialClear" class="dialer-clear-btn" title="Clear Number">⌫</button>
+        </div>
+
+        <div class="dialpad-grid">
+          <button class="dial-key" data-val="1"><span>1</span><small></small></button>
+          <button class="dial-key" data-val="2"><span>2</span><small>ABC</small></button>
+          <button class="dial-key" data-val="3"><span>3</span><small>DEF</small></button>
+          <button class="dial-key" data-val="4"><span>4</span><small>GHI</small></button>
+          <button class="dial-key" data-val="5"><span>5</span><small>JKL</small></button>
+          <button class="dial-key" data-val="6"><span>6</span><small>MNO</small></button>
+          <button class="dial-key" data-val="7"><span>7</span><small>PQRS</small></button>
+          <button class="dial-key" data-val="8"><span>8</span><small>TUV</small></button>
+          <button class="dial-key" data-val="9"><span>9</span><small>WXYZ</small></button>
+          <button class="dial-key" data-val="*"><span>*</span><small></small></button>
+          <button class="dial-key" data-val="0"><span>0</span><small>+</small></button>
+          <button class="dial-key" data-val="#"><span>#</span><small></small></button>
+        </div>
+
+        <div class="dial-action-row">
+          <button id="btnDialCall" class="btn-dial-green">
+            <span>📞</span> Call via SIM
+          </button>
+        </div>
+        <p class="dial-hint">Call will dial automatically on speakerphone so you can hear and speak through the browser.</p>
+      </div>
+
+      <!-- Tab 2: Call Logs -->
+      <div id="callTabLogs" class="call-tab-section" style="display: none;">
+        <div class="call-log-filter-bar">
+          <button class="call-log-filter-pill active" data-filter="all">All</button>
+          <button class="call-log-filter-pill" data-filter="incoming">📥 In</button>
+          <button class="call-log-filter-pill" data-filter="outgoing">📤 Out</button>
+          <button class="call-log-filter-pill" data-filter="missed">❌ Missed</button>
+        </div>
+        <div id="callLogsList" class="call-logs-container">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Tab 3: Recordings -->
+      <div id="callTabRecordings" class="call-tab-section" style="display: none;">
+        <div id="recordingsList" class="recordings-container">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- Live Toast Notification Container -->
+  <div id="smsToastContainer" class="sms-toast-container"></div>
+
+  <!-- Mobile Bottom Tab Navigation Bar -->
+  <nav class="mobile-nav-bar" id="mobileNavBar">
+    <button class="mobile-nav-item active" data-tab="live">
+      <span class="nav-icon">📹</span>
+      <span class="nav-label">Live</span>
+    </button>
+    <button class="mobile-nav-item" data-tab="sms">
+      <span class="nav-icon">💬</span>
+      <span class="nav-label">SMS</span>
+      <span id="mobileSmsBadge" class="mobile-badge" style="display:none;">0</span>
+    </button>
+    <button class="mobile-nav-item" data-tab="calls">
+      <span class="nav-icon">📞</span>
+      <span class="nav-label">Calls</span>
+    </button>
+    <button class="mobile-nav-item" data-tab="health">
+      <span class="nav-icon">🩺</span>
+      <span class="nav-label">Health</span>
+    </button>
+    <button class="mobile-nav-item" data-tab="settings">
+      <span class="nav-icon">⚙️</span>
+      <span class="nav-label">Config</span>
+    </button>
+  </nav>
+
+  <!-- Modular Scripts -->
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>

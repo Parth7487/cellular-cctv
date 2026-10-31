@@ -1,0 +1,2153 @@
+:root {
+  --bg-primary: #0a0b10;
+  --bg-surface: #12141e;
+  --bg-surface-elevated: #1a1d2c;
+  --bg-overlay: rgba(10, 11, 16, 0.75);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-focus: #00e5ff;
+  --text-primary: #f0f4fc;
+  --text-secondary: #8c96ac;
+  --text-muted: #525a70;
+  --accent-cyan: #00e5ff;
+  --accent-cyan-glow: rgba(0, 229, 255, 0.25);
+  --accent-green: #00e676;
+  --accent-amber: #ffab00;
+  --accent-red: #ff1744;
+  --accent-red-glow: rgba(255, 23, 68, 0.3);
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --font-mono: 'SF Mono', 'Fira Code', 'Roboto Mono', monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* Header */
+.app-header {
+  height: 64px;
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  z-index: 10;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, var(--accent-cyan), #0077ff);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+  font-weight: 900;
+  font-size: 14px;
+}
+
+.brand-title {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.brand-badge {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  background: rgba(0, 229, 255, 0.12);
+  color: var(--accent-cyan);
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 229, 255, 0.3);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background-color: var(--bg-surface-elevated);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  border: 1px solid var(--border-subtle);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--text-muted);
+}
+
+.status-dot.idle { background-color: var(--accent-amber); box-shadow: 0 0 8px var(--accent-amber); }
+.status-dot.live { background-color: var(--accent-red); box-shadow: 0 0 10px var(--accent-red); animation: pulse 1.5s infinite; }
+.status-dot.connected { background-color: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.6; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Main Container */
+.main-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  gap: 24px;
+}
+
+@media (min-width: 1024px) {
+  .main-container {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+  }
+}
+
+/* Video Stage */
+.video-stage-card {
+  background-color: var(--bg-surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Video Overlays */
+.video-overlay-top {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.cam-meta-badge {
+  background: var(--bg-overlay);
+  backdrop-filter: blur(8px);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-family: var(--font-mono);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border-subtle);
+}
+
+.video-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: var(--text-secondary);
+  background: radial-gradient(circle at center, #171a26 0%, #0a0b10 100%);
+}
+
+.spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid rgba(0, 229, 255, 0.15);
+  border-top-color: var(--accent-cyan);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Quick Bar below video */
+.video-controls-bar {
+  padding: 16px 20px;
+  background-color: var(--bg-surface-elevated);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.button-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+button {
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--accent-cyan);
+  background-color: rgba(0, 229, 255, 0.08);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+button.primary {
+  background: linear-gradient(135deg, var(--accent-cyan), #0077ff);
+  color: #000;
+  border: none;
+  font-weight: 700;
+}
+
+button.primary:hover:not(:disabled) {
+  box-shadow: 0 0 16px var(--accent-cyan-glow);
+}
+
+button.danger {
+  background-color: rgba(255, 23, 68, 0.12);
+  color: var(--accent-red);
+  border-color: rgba(255, 23, 68, 0.4);
+}
+
+button.danger:hover:not(:disabled) {
+  background-color: var(--accent-red);
+  color: #fff;
+  box-shadow: 0 0 16px var(--accent-red-glow);
+}
+
+button.active {
+  background-color: var(--accent-amber);
+  color: #000;
+  border-color: var(--accent-amber);
+  box-shadow: 0 0 12px rgba(255, 171, 0, 0.3);
+}
+
+/* Sidebar & Control Decks */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.panel-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.panel-title {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Form inputs */
+.input-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-field label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+input[type="text"], input[type="url"] {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-family: var(--font-mono);
+  outline: none;
+}
+
+input[type="text"]:focus, input[type="url"]:focus {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 8px var(--accent-cyan-glow);
+}
+
+/* Push to Talk Intercom Button */
+.ptt-button {
+  width: 100%;
+  height: 64px;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-surface-elevated);
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: none;
+  cursor: pointer;
+}
+
+.ptt-button.transmitting {
+  background-color: var(--accent-red);
+  color: #fff;
+  border: 2px solid var(--accent-red);
+  box-shadow: 0 0 24px var(--accent-red-glow);
+  animation: pulse 1s infinite;
+}
+
+/* Sliders */
+.slider-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.slider-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+input[type="range"] {
+  accent-color: var(--accent-cyan);
+  width: 100%;
+  cursor: pointer;
+}
+
+.preset-pills {
+  display: flex;
+  gap: 8px;
+}
+
+.preset-pill {
+  flex: 1;
+  padding: 6px;
+  font-size: 11px;
+  text-align: center;
+  justify-content: center;
+}
+
+/* ==========================================================================
+   SMS & OTP Relay Drawer and Notifications
+   ========================================================================== */
+
+/* Header SMS Button & Badge */
+.sms-header-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.sms-header-btn:hover {
+  border-color: var(--accent-cyan);
+  background-color: rgba(0, 229, 255, 0.08);
+}
+
+.sms-badge {
+  background: linear-gradient(135deg, var(--accent-cyan), #0077ff);
+  color: #000;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse 2s infinite;
+}
+
+/* SMS Drawer Backdrop */
+.sms-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 998;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.sms-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* SMS Drawer */
+.sms-drawer {
+  position: fixed;
+  top: 0;
+  right: -460px;
+  width: 440px;
+  max-width: 100vw;
+  height: 100vh;
+  background: rgba(18, 20, 30, 0.95);
+  backdrop-filter: blur(20px);
+  border-left: 1px solid var(--border-subtle);
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sms-drawer.active {
+  right: 0;
+}
+
+.sms-drawer-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sms-drawer-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sms-drawer-subtitle {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.sms-header-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sms-icon-btn {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sms-icon-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--accent-cyan);
+}
+
+.sms-icon-btn.rotating {
+  transform: rotate(360deg);
+  transition: transform 0.8s ease;
+}
+
+/* Search Bar */
+.sms-search-bar {
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.sms-search-bar input {
+  width: 100%;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  padding: 10px 14px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.sms-search-bar input:focus {
+  border-color: var(--accent-cyan);
+}
+
+/* Direction Filter Tabs */
+.sms-filter-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 10px 24px;
+  background: rgba(10, 11, 16, 0.4);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.sms-filter-pill {
+  flex: 1;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.sms-filter-pill:hover {
+  color: var(--text-primary);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.sms-filter-pill.active {
+  background: rgba(0, 229, 255, 0.12);
+  color: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+}
+
+/* Message List */
+.sms-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Empty State */
+.sms-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.sms-empty-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+.sms-empty-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.sms-empty-desc {
+  font-size: 12px;
+  line-height: 1.5;
+  max-width: 280px;
+}
+
+/* SMS Card */
+.sms-card {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.sms-card.type-received {
+  border-left: 3px solid var(--accent-green);
+}
+
+.sms-card.type-sent {
+  border-left: 3px solid #b388ff;
+}
+
+.sms-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.sms-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.sms-party-info {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Message Type Badges */
+.sms-type-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.sms-type-badge.badge-received {
+  background: rgba(0, 230, 118, 0.15);
+  color: var(--accent-green);
+  border: 1px solid rgba(0, 230, 118, 0.3);
+}
+
+.sms-type-badge.badge-sent {
+  background: rgba(179, 136, 255, 0.15);
+  color: #b388ff;
+  border: 1px solid rgba(179, 136, 255, 0.3);
+}
+
+.sms-party-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.sms-contact-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.sms-phone-pill {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.sms-relative-time {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.sms-body {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  word-break: break-word;
+  white-space: pre-wrap;
+  padding: 2px 0;
+}
+
+.sms-otp-highlight {
+  background: rgba(0, 230, 118, 0.2);
+  color: var(--accent-green);
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+/* Card Footer with Exact Timestamp */
+.sms-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 11px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sms-exact-time {
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.sms-copy-btn {
+  background: var(--accent-green);
+  color: #000;
+  border: none;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.sms-copy-btn:hover {
+  filter: brightness(1.15);
+  transform: scale(1.02);
+}
+
+.sms-copy-btn.copied {
+  background: #fff;
+  color: #000;
+}
+
+/* ==========================================================================
+   Live Toast Notification for Instant Messages & OTP
+   ========================================================================== */
+
+.sms-toast-container {
+  position: fixed;
+  top: 76px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.sms-toast {
+  pointer-events: auto;
+  background: rgba(18, 20, 30, 0.95);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  width: 380px;
+  max-width: 90vw;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  display: flex;
+  gap: 12px;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.sms-toast.toast-received {
+  border-left: 4px solid var(--accent-green);
+}
+
+.sms-toast.toast-sent {
+  border-left: 4px solid #b388ff;
+}
+
+.sms-toast.animate-slide-in {
+  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sms-toast.animate-fade-out {
+  opacity: 0;
+  transform: translateX(40px);
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.sms-toast-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.sms-toast-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sms-toast-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.sms-toast-type {
+  font-size: 10px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--accent-cyan);
+  display: block;
+}
+
+.sms-toast-party {
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.sms-toast-time {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.sms-toast-body {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text-primary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sms-toast-meta {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+}
+
+.sms-toast-action {
+  margin-top: 4px;
+}
+
+.sms-toast-copy-btn {
+  background: var(--accent-green);
+  color: #000;
+  border: none;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.sms-toast-copy-btn.copied {
+  background: #fff;
+  color: #000;
+}
+
+.sms-toast-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0 4px;
+  height: 20px;
+}
+
+.sms-toast-close:hover {
+  color: var(--text-primary);
+}
+
+/* ==========================================================================
+   Device Health & Diagnostics Drawer
+   ========================================================================== */
+
+.health-header-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.health-header-btn:hover {
+  border-color: #00e676;
+  background-color: rgba(0, 230, 118, 0.08);
+}
+
+.health-drawer {
+  position: fixed;
+  top: 0;
+  right: -520px;
+  width: 480px;
+  max-width: 100vw;
+  height: 100vh;
+  background: rgba(18, 20, 30, 0.96);
+  backdrop-filter: blur(20px);
+  border-left: 1px solid var(--border-subtle);
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.health-drawer.active {
+  right: 0;
+}
+
+.health-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Health Cards */
+.health-card {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.health-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.health-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.3px;
+}
+
+.health-status-badge {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px 8px;
+  border-radius: 4px;
+  color: var(--accent-cyan);
+}
+
+.health-subtle-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Battery Hero */
+.health-battery-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.health-battery-val {
+  font-family: var(--font-mono);
+  font-size: 36px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.health-battery-stats {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  text-align: right;
+}
+
+/* Progress Meters */
+.health-meter-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.health-meter-bg {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.health-meter-fill {
+  height: 100%;
+  background: var(--accent-cyan);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+/* Top Space-Consuming Apps List */
+.health-apps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.health-loading {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 16px 0;
+}
+
+.health-empty-apps {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 16px 0;
+}
+
+.health-app-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: rgba(10, 11, 16, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+}
+
+.health-app-rank {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  width: 24px;
+}
+
+.health-app-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.health-app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.health-app-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.health-app-size {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffab00;
+  margin-left: 8px;
+}
+
+.health-app-bar-bg {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.health-app-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffab00, #ff1744);
+  border-radius: 2px;
+}
+
+.health-app-pkg {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* System Info 2-Column Grid */
+.health-sys-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.health-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: rgba(10, 11, 16, 0.4);
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.health-info-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.health-info-val {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  word-break: break-all;
+}
+
+/* ==========================================================================
+   Calls & Dialer Drawer, Active Call HUD, and Incoming Alert
+   ========================================================================== */
+
+.calls-header-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.calls-header-btn:hover {
+  border-color: #00e676;
+  background-color: rgba(0, 230, 118, 0.08);
+}
+
+.calls-drawer {
+  position: fixed;
+  top: 0;
+  right: -500px;
+  width: 460px;
+  max-width: 100vw;
+  height: 100vh;
+  background: rgba(18, 20, 30, 0.96);
+  backdrop-filter: blur(20px);
+  border-left: 1px solid var(--border-subtle);
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.calls-drawer.active {
+  right: 0;
+}
+
+.calls-tabs-bar {
+  display: flex;
+  gap: 8px;
+  padding: 10px 24px;
+  background: rgba(10, 11, 16, 0.4);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.calls-tab-pill {
+  flex: 1;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.calls-tab-pill:hover {
+  color: var(--text-primary);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.calls-tab-pill.active {
+  background: rgba(0, 230, 118, 0.12);
+  color: #00e676;
+  border-color: #00e676;
+}
+
+.calls-drawer-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Active Call HUD Banner */
+.active-call-banner {
+  background: rgba(0, 230, 118, 0.1);
+  border: 1px solid rgba(0, 230, 118, 0.4);
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.active-call-banner.ringing {
+  background: rgba(255, 171, 0, 0.1);
+  border-color: rgba(255, 171, 0, 0.4);
+}
+
+.active-call-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.active-call-state-title {
+  font-size: 10px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: #00e676;
+  letter-spacing: 0.5px;
+}
+
+.active-call-party {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.active-call-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.active-call-timer {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 800;
+  color: #00e676;
+}
+
+.active-call-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.call-hud-btn {
+  border: none;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.call-hud-btn.speaker {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+}
+
+.call-hud-btn.hangup {
+  background: var(--accent-red);
+  color: #fff;
+}
+
+/* Dialer Screen & Pad */
+.dialer-screen {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.dialer-screen input {
+  width: 100%;
+  background: rgba(10, 11, 16, 0.6);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 14px 44px 14px 16px;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  outline: none;
+  text-align: center;
+}
+
+.dialer-screen input:focus {
+  border-color: #00e676;
+}
+
+.dialer-clear-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.dialer-clear-btn:hover {
+  color: var(--text-primary);
+}
+
+.dialpad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.dial-key {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  height: 54px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  transition: all 0.15s ease;
+}
+
+.dial-key span {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.dial-key small {
+  font-size: 9px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+.dial-key:hover {
+  background: rgba(0, 230, 118, 0.1);
+  border-color: #00e676;
+  transform: translateY(-1px);
+}
+
+.dial-key:active {
+  transform: scale(0.96);
+}
+
+.dial-action-row {
+  display: flex;
+  justify-content: center;
+}
+
+.btn-dial-green {
+  width: 100%;
+  background: linear-gradient(135deg, #00e676, #00b0ff);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-dial-green:hover {
+  filter: brightness(1.15);
+  box-shadow: 0 0 20px rgba(0, 230, 118, 0.4);
+}
+
+.dial-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 12px;
+  line-height: 1.5;
+}
+
+/* Call Logs */
+.call-log-filter-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.call-log-filter-pill {
+  flex: 1;
+  background: rgba(10, 11, 16, 0.4);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 6px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.call-log-filter-pill.active {
+  color: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+  background: rgba(0, 229, 255, 0.1);
+}
+
+.call-logs-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.call-card {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.2s;
+}
+
+.call-card.incoming {
+  border-left: 3px solid #00e676;
+}
+
+.call-card.outgoing {
+  border-left: 3px solid #00e5ff;
+}
+
+.call-card.missed, .call-card.rejected {
+  border-left: 3px solid #ff1744;
+}
+
+.call-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.call-party-details {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.call-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 800;
+  padding: 2px 5px;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+}
+
+.badge-incoming {
+  background: rgba(0, 230, 118, 0.15);
+  color: #00e676;
+}
+
+.badge-outgoing {
+  background: rgba(0, 229, 255, 0.15);
+  color: #00e5ff;
+}
+
+.badge-missed {
+  background: rgba(255, 23, 68, 0.15);
+  color: #ff1744;
+}
+
+.call-contact-name {
+  font-size: 13px;
+  color: #fff;
+}
+
+.call-phone-pill {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.call-redial-btn {
+  background: rgba(0, 230, 118, 0.12);
+  border: 1px solid rgba(0, 230, 118, 0.3);
+  color: #00e676;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.call-redial-btn:hover {
+  background: #00e676;
+  color: #000;
+}
+
+.call-card-bottom {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  padding-top: 6px;
+}
+
+/* Call Empty State */
+.call-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.call-empty-icon {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.call-empty-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.call-empty-desc {
+  font-size: 12px;
+  line-height: 1.4;
+  max-width: 260px;
+}
+
+/* Recordings Tab */
+.recordings-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.recording-card {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.recording-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.recording-name {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: #fff;
+}
+
+.recording-size {
+  font-size: 11px;
+  color: #ffab00;
+  font-family: var(--font-mono);
+}
+
+.recording-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Floating Incoming Call Modal Alert */
+.incoming-call-modal {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000;
+  animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.incoming-call-card {
+  background: rgba(18, 20, 30, 0.98);
+  border: 2px solid #00e676;
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 10px 40px rgba(0, 230, 118, 0.3);
+  backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 380px;
+  max-width: 90vw;
+}
+
+.incoming-call-icon {
+  font-size: 32px;
+}
+
+.incoming-call-info {
+  flex: 1;
+}
+
+.incoming-call-tag {
+  font-size: 10px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: #00e676;
+  letter-spacing: 0.5px;
+}
+
+.incoming-call-name {
+  font-size: 16px;
+  font-weight: 800;
+  color: #fff;
+  margin: 2px 0;
+}
+
+.incoming-call-number {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+}
+
+.incoming-call-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn-call-answer {
+  background: #00e676;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-call-answer:hover {
+  filter: brightness(1.15);
+}
+
+.btn-call-reject {
+  background: #ff1744;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-call-reject:hover {
+  filter: brightness(1.15);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* Floating Live Audio Unmute Banner */
+.unmute-overlay-banner {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(8, 12, 22, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--accent-cyan);
+  box-shadow: 0 4px 24px rgba(0, 229, 255, 0.35);
+  color: #fff;
+  padding: 10px 22px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 10;
+  transition: all 0.25s ease;
+  pointer-events: auto;
+}
+
+.unmute-overlay-banner:hover {
+  transform: translateX(-50%) scale(1.04);
+  box-shadow: 0 6px 30px rgba(0, 229, 255, 0.55);
+  background: rgba(0, 229, 255, 0.18);
+}
+
+.unmute-pulse-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 10px var(--accent-cyan);
+  animation: pulse 1.2s infinite;
+}
+
+/* Header Battery Badge */
+.header-battery-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  background-color: var(--bg-surface-elevated);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  transition: border-color 0.2s ease;
+}
+
+.header-battery-badge.charging {
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+}
+
+/* Push to Talk Audio Input Meter */
+.ptt-volume-container {
+  margin-top: 10px;
+  background: var(--bg-surface-elevated);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+}
+
+.ptt-volume-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.ptt-meter-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.ptt-meter-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent-green), var(--accent-cyan));
+  border-radius: 3px;
+  transition: width 0.06s ease;
+}
+
+/* Mobile Bottom Navigation Bar */
+.mobile-nav-bar {
+  display: none;
+}
+
+/* Responsive Mobile Layout (Phones & Small Tablets) */
+@media (max-width: 860px) {
+  body {
+    padding-bottom: 74px !important;
+  }
+
+  .app-header {
+    padding: 0 14px;
+    height: 56px;
+  }
+
+  .brand-title {
+    font-size: 14px;
+  }
+
+  .brand-badge {
+    display: none;
+  }
+
+  /* Move drawer buttons to mobile bottom tab bar */
+  .sms-header-btn, .health-header-btn, .calls-header-btn {
+    display: none !important;
+  }
+
+  .status-badge {
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+
+  .main-container {
+    padding: 12px;
+    gap: 14px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .video-stage-card {
+    border-radius: var(--radius-sm);
+  }
+
+  .video-controls-bar {
+    padding: 10px 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .video-controls-bar .button-group {
+    flex: 1;
+    justify-content: flex-start;
+  }
+
+  .video-controls-bar button {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .sidebar {
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  .panel-card {
+    padding: 16px;
+  }
+
+  .ptt-button {
+    min-height: 52px;
+    font-size: 15px;
+  }
+
+  /* Fixed Bottom Tab Bar */
+  .mobile-nav-bar {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: rgba(8, 10, 16, 0.96);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border-subtle);
+    z-index: 1000;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 4px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.6);
+  }
+
+  .mobile-nav-item {
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    color: var(--text-secondary);
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+    position: relative;
+    flex: 1;
+    min-height: 48px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-nav-item .nav-icon {
+    font-size: 20px;
+    transition: transform 0.2s ease;
+  }
+
+  .mobile-nav-item.active {
+    color: var(--accent-cyan);
+  }
+
+  .mobile-nav-item.active .nav-icon {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 8px var(--accent-cyan));
+  }
+
+  .mobile-badge {
+    position: absolute;
+    top: 4px;
+    right: calc(50% - 16px);
+    background: var(--accent-red);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 10px;
+    padding: 1px 5px;
+    min-width: 16px;
+    text-align: center;
+  }
+
+  /* Mobile Full-Screen Drawers */
+  .sms-drawer, .health-drawer, .calls-drawer {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    right: -100vw !important;
+    border-left: none;
+    border-radius: 0;
+    padding-bottom: 74px;
+    box-shadow: none;
+  }
+
+  .sms-drawer.active, .health-drawer.active, .calls-drawer.active {
+    right: 0 !important;
+  }
+
+  .sms-drawer-header {
+    padding: 14px 16px;
+  }
+
+  .dialpad-grid {
+    gap: 10px;
+  }
+
+  .dial-key {
+    height: 60px;
+  }
+
+  .unmute-overlay-banner {
+    bottom: 16px;
+    padding: 8px 16px;
+    font-size: 12px;
+  }
+}
+
+/* Audio Boost Box */
+.audio-boost-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-surface-elevated);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+/* Video Recording Controls */
+.record-btn {
+  background: var(--bg-surface-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  transition: all 0.2s ease;
+}
+
+.record-btn:hover {
+  border-color: var(--accent-red);
+}
+
+.record-btn.recording {
+  background: var(--accent-red) !important;
+  color: #fff !important;
+  border-color: var(--accent-red) !important;
+  box-shadow: 0 0 12px var(--accent-red-glow);
+}
+
+.record-toggle-btn {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  font-size: 11px !important;
+  padding: 4px 8px !important;
+  height: 32px !important;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.record-toggle-btn.active {
+  color: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+  background: rgba(0, 240, 255, 0.1);
+}
+
+.recording-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 0, 85, 0.2);
+  color: #ff3366;
+  border: 1px solid #ff3366;
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.rec-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ff0055;
+  animation: pulse-rec 1s infinite alternate;
+}
+
+@keyframes pulse-rec {
+  0% { opacity: 0.3; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Quick Message Chips */
+.quick-chip {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  border-radius: 12px;
+  padding: 3px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.quick-chip:hover {
+  background: rgba(0, 240, 255, 0.15);
+  color: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+}
+
+

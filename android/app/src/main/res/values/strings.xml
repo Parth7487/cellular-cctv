@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Cellular CCTV</string>
+    <string name="server_url_hint">Signaling Server URL (e.g. wss://... or ws://...)</string>
+    <string name="room_id_hint">Room ID (e.g. living-room)</string>
+    <string name="start_service">START CCTV SERVICE</string>
+    <string name="stop_service">STOP CCTV SERVICE</string>
+    <string name="status_idle">Status: Idle</string>
+    <string name="status_connected">Status: Signaling Connected (Waiting for Viewers)</string>
+    <string name="status_streaming">Status: LIVE STREAMING (Viewer Active)</string>
+    <string name="switch_camera">SWITCH LENS</string>
+    <string name="toggle_torch">FLASHLIGHT</string>
+    <string name="black_screen_btn">OLED SAVER MODE</string>
+</resources>
