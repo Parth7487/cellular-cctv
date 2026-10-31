@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: cellular-cctv
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: singapore
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: NODE_ENV
+        value: production
