@@ -59,8 +59,8 @@ const server = http.createServer((req, res) => {
     const host = req.headers.host || 'cellular-cctv.onrender.com';
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
-      versionCode: 2,
-      versionName: '1.0.1',
+      versionCode: 1,
+      versionName: '1.0.0',
       apkUrl: `${proto}://${host}/download/cctv-latest.apk`,
       releaseNotes: 'Automatic boot on phone restart, OTA update support'
     }));
@@ -85,6 +85,11 @@ const server = http.createServer((req, res) => {
 
   fs.stat(filePath, (err, stats) => {
     if (err || !stats.isFile()) {
+      if (reqPath.startsWith('/download/')) {
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('APK not found on server');
+        return;
+      }
       // Fallback for single page app if file doesn't exist
       const indexPath = path.join(PUBLIC_DIR, 'index.html');
       fs.stat(indexPath, (indexErr, indexStats) => {

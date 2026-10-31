@@ -114,10 +114,19 @@ class AppUpdateManager(private val context: Context) {
                 }
 
                 try {
+                    val contentType = response.header("Content-Type") ?: ""
                     val inputStream = response.body?.byteStream() ?: return
                     FileOutputStream(destinationApk).use { output ->
                         inputStream.copyTo(output)
                     }
+
+                    if (contentType.contains("text/html") || destinationApk.length() < 100_000) {
+                        Log.e(TAG, "Downloaded file is not a valid APK (${destinationApk.length()} bytes, $contentType)")
+                        destinationApk.delete()
+                        onStatus?.invoke("Update download failed: Invalid APK file from server.")
+                        return
+                    }
+
                     Log.i(TAG, "Update APK downloaded successfully (${destinationApk.length()} bytes)")
                     onStatus?.invoke("APK downloaded. Launching installer...")
 
