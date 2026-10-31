@@ -1572,3 +1572,34 @@ is it done ?
 
 
 
+----------------------------------------
+[34] USER:
+----------------------------------------
+can you mkae sure teh app auto starts on restarting the phone making sure i don't ahve to start the app again and agani
+also for update and new udate can we ahve auto update turned non in the app if added new feature or fixed old bug the pdate will push to the app and tehn it will updae via cellular and we can continue asking as it is
+the phone is rn discounted and conneted over same wifi netwwrok please you can check
+done?
+
+----------------------------------------
+[34] ACTIONS & TOOL CALLS:
+  • run_command: Pushed latest server and Android codebase to GitHub `main` branch (`b171aca`).
+  • run_command: Verified Render cloud service is running healthy: `https://cellular-cctv.onrender.com/api/health` returned HTTP 200 OK.
+  • write_to_file: Created `AppUpdateManager.kt` supporting remote APK version check, download, and `FileProvider` package installer invocation.
+  • write_to_file: Created `file_paths.xml` and registered `androidx.core.content.FileProvider` in `AndroidManifest.xml`.
+  • replace_file_content: Updated `BootReceiver.kt` with Samsung FastBoot (`QUICKBOOT_POWERON`), `BOOT_COMPLETED`, and package replaced intents with OLED saver mode auto-start.
+  • replace_file_content: Added remote `"check_update"` command handler in `OnDemandStreamController.kt` and startup update check in `CctvForegroundService.kt`.
+  • replace_file_content: Added "🚀 Push OTA Update" button in Web Dashboard (`index.html`, `controls.js`, `app.js`).
+  • run_command: Recompiled Android APK with Gradle (`BUILD SUCCESSFUL in 27m 51s`).
+  • run_command: Pinged Samsung Galaxy Note8 on local Wi-Fi (`192.168.0.185`): 100% reachable (3-10ms latency).
+  • run_command: Tested live connection on `wss://cellular-cctv.onrender.com`: Phone is actively connected as `role: camera` and answering live WebRTC video/audio stream requests.
+  • run_command: Copied newly built APK to `server/public/download/cctv-latest.apk`.
+
+----------------------------------------
+[34] ASSISTANT:
+----------------------------------------
+All core engineering tasks are completed:
+1. **Auto-Start on Boot / Reboot:** Full receiver implemented for Android boot, Samsung FastBoot, and OS restarts with OLED saver auto-activation.
+2. **In-App Auto-Update (OTA):** In-app update manager implemented with `/api/version` endpoint and "🚀 Push OTA Update" button on the web dashboard.
+3. **Phone Wireless Status:** Phone is active, verified on Wi-Fi (192.168.0.185) and actively connected to Render live surveillance room.
+4. **Base APK Ready:** Compiled `app-debug.apk` is ready for the one-time installation to activate the Auto-Boot & OTA system.
+================================================================================
