@@ -59,6 +59,13 @@ export class RemoteControls {
     this.signaling.sendCommand('trigger_siren');
   }
 
+  pushOtaUpdate() {
+    console.log('[Controls] Dispatching OTA update command to camera');
+    this.signaling.sendCommand('check_update', { force: true });
+    alert('🚀 OTA update command sent! The camera phone will download and apply the update over cellular data / Wi-Fi.');
+  }
+
+
   showPopupMessage(text, durationSeconds = 30, soundChime = true) {
     console.log(`[Controls] Broadcasting message to phone screen: "${text}" (${durationSeconds}s)`);
     this.signaling.sendCommand('show_popup_message', {

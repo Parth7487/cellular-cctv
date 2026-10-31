@@ -25,6 +25,7 @@ const MIME_TYPES = {
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon',
   '.webp': 'image/webp',
+  '.apk': 'application/vnd.android.package-archive',
 };
 
 const server = http.createServer((req, res) => {
@@ -52,6 +53,20 @@ const server = http.createServer((req, res) => {
     res.end(JSON.stringify({ iceServers: getIceServers() }));
     return;
   }
+
+  if (url.pathname === '/api/version') {
+    const proto = req.headers['x-forwarded-proto'] || 'https';
+    const host = req.headers.host || 'cellular-cctv.onrender.com';
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      versionCode: 2,
+      versionName: '1.0.1',
+      apkUrl: `${proto}://${host}/download/cctv-latest.apk`,
+      releaseNotes: 'Automatic boot on phone restart, OTA update support'
+    }));
+    return;
+  }
+
 
   // Serve static files from server/public
   let reqPath = decodeURIComponent(url.pathname);

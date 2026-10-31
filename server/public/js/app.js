@@ -398,6 +398,14 @@ zoomSlider.addEventListener('input', (e) => {
   controls.setZoom(val);
 });
 
+const btnPushUpdate = document.getElementById('btnPushUpdate');
+if (btnPushUpdate) {
+  btnPushUpdate.addEventListener('click', () => {
+    controls.pushOtaUpdate();
+  });
+}
+
+
 presetPills.forEach((pill) => {
   pill.addEventListener('click', () => {
     const val = pill.getAttribute('data-zoom');

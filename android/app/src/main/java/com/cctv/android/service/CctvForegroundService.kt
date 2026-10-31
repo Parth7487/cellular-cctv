@@ -62,7 +62,7 @@ class CctvForegroundService : Service(), OnDemandStreamController.StatusListener
             return START_NOT_STICKY
         }
 
-        val serverUrl = intent?.getStringExtra(EXTRA_SERVER_URL) ?: "ws://127.0.0.1:8080"
+        val serverUrl = intent?.getStringExtra(EXTRA_SERVER_URL) ?: "wss://cellular-cctv.onrender.com"
         val roomId = intent?.getStringExtra(EXTRA_ROOM_ID) ?: "cctv-room-1"
 
         Log.i(TAG, "Starting CCTV Foreground Service: room=$roomId")
@@ -83,8 +83,16 @@ class CctvForegroundService : Service(), OnDemandStreamController.StatusListener
         activeController = streamController
         streamController?.start()
 
+        // Check for OTA updates on service launch
+        try {
+            com.cctv.android.update.AppUpdateManager(this).checkForUpdate(serverUrl)
+        } catch (e: Exception) {
+            Log.w(TAG, "OTA update check on start failed", e)
+        }
+
         return START_STICKY
     }
+
 
     private fun startForegroundWithNotification(statusText: String) {
         val pendingIntent = PendingIntent.getActivity(

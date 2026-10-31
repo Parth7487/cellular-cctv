@@ -51,7 +51,13 @@ class SignalingClient(
 
     fun connect() {
         shouldReconnect = true
-        val request = Request.Builder().url(serverUrl).build()
+        val request = try {
+            Request.Builder().url(serverUrl.trim()).build()
+        } catch (e: Exception) {
+            Log.e(TAG, "Invalid signaling server URL: $serverUrl", e)
+            mainHandler.post { listener.onError("Invalid URL: ${e.message}") }
+            return
+        }
         webSocket = client.newWebSocket(request, object : WebSocketListener() {
             override fun onOpen(ws: WebSocket, response: Response) {
                 isConnected = true

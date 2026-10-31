@@ -19,15 +19,24 @@ class BootReceiver : BroadcastReceiver() {
         val action = intent.action
         Log.i(TAG, "Received broadcast action: $action")
 
-        if (action == Intent.ACTION_BOOT_COMPLETED || action == Intent.ACTION_MY_PACKAGE_REPLACED) {
+        val validActions = listOf(
+            Intent.ACTION_BOOT_COMPLETED,
+            Intent.ACTION_MY_PACKAGE_REPLACED,
+            "android.intent.action.QUICKBOOT_POWERON",
+            "com.htc.intent.action.QUICKBOOT_POWERON",
+            "android.intent.action.REBOOT"
+        )
+
+        if (action in validActions) {
             val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            val isEnabled = prefs.getBoolean(KEY_SERVICE_ENABLED, false)
+            // Default to TRUE so surveillance always resumes on reboot without user intervention
+            val isEnabled = prefs.getBoolean(KEY_SERVICE_ENABLED, true)
 
             if (isEnabled) {
                 val serverUrl = prefs.getString(KEY_SERVER_URL, "wss://cellular-cctv.onrender.com")
                 val roomId = prefs.getString(KEY_ROOM_ID, "cctv-room-1")
 
-                Log.i(TAG, "Auto-starting CCTV service after boot/update for room: $roomId")
+                Log.i(TAG, "Auto-starting CCTV service and camera pipeline after boot/update for room: $roomId")
 
                 val serviceIntent = Intent(context, CctvForegroundService::class.java).apply {
                     this.action = CctvForegroundService.ACTION_START
@@ -40,9 +49,21 @@ class BootReceiver : BroadcastReceiver() {
                 } catch (e: Exception) {
                     Log.e(TAG, "Failed to auto-start foreground service on boot", e)
                 }
+
+                // Also launch MainActivity in stealth OLED mode to ensure camera sensor is warmed up
+                try {
+                    val activityIntent = Intent(context, com.cctv.android.MainActivity::class.java).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                        putExtra("extra_boot_auto_start", true)
+                    }
+                    context.startActivity(activityIntent)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to launch MainActivity on boot", e)
+                }
             } else {
-                Log.i(TAG, "CCTV service was not running before reboot. Skipping auto-start.")
+                Log.i(TAG, "CCTV service was disabled in preferences. Skipping auto-start.")
             }
         }
     }
 }
+

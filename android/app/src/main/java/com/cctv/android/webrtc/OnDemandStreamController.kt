@@ -144,8 +144,13 @@ class OnDemandStreamController(
             "trigger_siren" -> {
                 listener.onStatusChanged("SIREN TRIGGERED", true, activeViewerCount)
             }
+            "check_update" -> {
+                Log.i(TAG, "Dashboard triggered OTA check_update command")
+                com.cctv.android.update.AppUpdateManager(context).checkForUpdate(serverUrl)
+            }
         }
     }
+
 
     override fun onGetSmsHistoryReceived(fromPeerId: String) {
         Log.i(TAG, "Dashboard requested SMS inbox history (from peer $fromPeerId)")

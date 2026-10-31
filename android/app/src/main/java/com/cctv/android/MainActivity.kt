@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity(),
     private val KEY_TELEGRAM_CHAT_ID = "key_telegram_chat_id"
     private val KEY_AUTO_SIREN = "key_auto_siren"
 
-    private val DEFAULT_SERVER_URL = "ws://127.0.0.1:8080"
+    private val DEFAULT_SERVER_URL = "wss://cellular-cctv.onrender.com"
     private val DEFAULT_ROOM_ID = "cctv-room-1"
 
     private lateinit var prefs: SharedPreferences
@@ -134,7 +134,12 @@ class MainActivity : AppCompatActivity(),
 
         checkAndRequestPermissions()
         syncServiceState()
+
+        if (intent?.getBooleanExtra("extra_boot_auto_start", false) == true) {
+            enableOledSaver()
+        }
     }
+
 
     private fun bindViews() {
         previewView = findViewById(R.id.previewView)
